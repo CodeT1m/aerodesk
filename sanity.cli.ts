@@ -11,7 +11,7 @@ export default defineCliConfig({
     generates: "./src/sanity/types.ts",
   },
   deployment: {
-    appId: undefined,
+    appId: "ur5i4fwoseywn4u9rr4k7vgx",
     autoUpdates: false,
   },
 });
