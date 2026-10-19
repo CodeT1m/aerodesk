@@ -92,7 +92,7 @@ export function LiveFlightResults({
   }
 
   return (
-    <section className="flight-board overflow-hidden rounded-3xl border border-cyan-300/20 bg-[#071b2e] text-slate-100 shadow-[0_24px_60px_-30px_rgba(2,28,48,.75)]">
+    <section className="flight-board overflow-hidden rounded-3xl border border-cyan-300/25 bg-[#071b2e] text-slate-100 shadow-[0_24px_60px_-30px_rgba(2,28,48,.75),0_0_30px_-18px_rgba(103,232,249,.45)]">
       <div className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(120deg,#0d3551,#09253c_58%,#122944)] p-6 sm:p-8">
         <div className="absolute -right-16 -top-24 size-64 rounded-full bg-cyan-300/10 blur-3xl" aria-hidden="true" />
         <div className="relative flex flex-wrap items-start justify-between gap-5">
@@ -113,7 +113,7 @@ export function LiveFlightResults({
               Flight status from the current feed, cached for one day. Use a flight as a template for a test itinerary on your selected travel date. The future date, fares, and seats are simulated.
             </p>
           </div>
-          <div className="rounded-xl border border-cyan-200/20 bg-white/5 px-4 py-3 text-right">
+          <div className="glow-accent rounded-xl border border-cyan-200/30 bg-white/5 px-4 py-3 text-right">
             <div className="font-mono text-2xl font-semibold text-white">{flights.length}</div>
             <div className="text-[11px] uppercase tracking-widest text-cyan-200">Flights in feed</div>
           </div>
@@ -147,7 +147,7 @@ export function LiveFlightResults({
                 <div><div className="font-mono text-lg text-cyan-100">{clock(flight.departureAt)}</div><div className="text-xs text-slate-400">{day(flight.departureAt)}</div></div>
                 <div><div className="font-mono text-lg text-cyan-100">{clock(flight.arrivalAt)}</div><div className="text-xs text-slate-400">{day(flight.arrivalAt)}</div></div>
                 <div><div className="font-mono text-sm text-slate-200">{gate(flight.departureTerminal, flight.departureGate)}</div><div className="text-[11px] text-slate-400">Terminal · gate</div></div>
-                <div className="flex items-center gap-2 text-sm capitalize text-slate-200"><span className={`size-2 rounded-full ${flight.status === "active" ? "animate-pulse bg-cyan-300 motion-reduce:animate-none" : flight.status === "scheduled" ? "bg-amber-300" : "bg-slate-400"}`} aria-hidden="true" />{flight.status.replaceAll("_", " ")}</div>
+                <div className="flex items-center gap-2 text-sm capitalize text-slate-200"><span className={`size-2 rounded-full ${flight.status === "active" ? "animate-pulse bg-cyan-300 shadow-[0_0_12px_#67e8f9] motion-reduce:animate-none" : flight.status === "scheduled" ? "bg-amber-300 shadow-[0_0_10px_#fcd34d]" : "bg-slate-400"}`} aria-hidden="true" />{flight.status.replaceAll("_", " ")}</div>
                 {canSimulate ? (
                   <button type="button" onClick={() => simulate(flight)} disabled={Boolean(pendingId)} className="inline-flex w-fit min-w-36 items-center justify-center gap-2 rounded-lg bg-cyan-300 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-100 hover:shadow-[0_0_24px_rgba(103,232,249,.4)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-100 disabled:cursor-wait disabled:opacity-50">
                     <Ticket className="size-3.5" aria-hidden="true" />{pendingId === flight.id ? "Preparing…" : "Simulate booking"}<ArrowRight className="size-3.5" aria-hidden="true" />

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { shadcn } from "@clerk/ui/themes";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Barlow_Condensed, Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteShell } from "@/components/site-shell";
 import { Toaster } from "@/components/ui/sonner";
@@ -19,6 +19,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const barlowCondensed = Barlow_Condensed({
+  variable: "--font-barlow-condensed",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Aerodesk",
   description: "Search flights, pick seats, and complete dummy bookings with Concierge Desk.",
@@ -28,7 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${barlowCondensed.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full bg-background text-foreground">

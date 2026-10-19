@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createMCPClient } from "@ai-sdk/mcp";
 import { anthropic } from "@ai-sdk/anthropic";
-import { convertToModelMessages, stepCountIs, streamText, type UIMessage } from "ai";
+import { APICallError, convertToModelMessages, stepCountIs, streamText, type UIMessage } from "ai";
 import { getEntitlements } from "@/lib/entitlements";
 import { conciergeTools } from "@/lib/ai/tools";
 import { saveConciergeConversation } from "@/lib/ai/insights";
@@ -101,5 +101,15 @@ export async function POST(req: Request) {
     },
   });
 
-  return result.toUIMessageStreamResponse();
+  return result.toUIMessageStreamResponse({
+    onError: (error) => {
+      if (APICallError.isInstance(error) && error.statusCode === 401) {
+        return "Concierge is temporarily unavailable because its AI service credentials were rejected. Please contact the site owner.";
+      }
+      if (APICallError.isInstance(error) && error.statusCode === 429) {
+        return "Concierge has reached its AI service limit. Please try again later.";
+      }
+      return "Concierge could not complete that request. Please try again later.";
+    },
+  });
 }

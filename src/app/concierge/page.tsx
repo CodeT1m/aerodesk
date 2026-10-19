@@ -31,7 +31,7 @@ export default async function ConciergePage() {
       <PageIntro
         kicker="Concierge"
         title="Concierge Desk"
-          description="Tap a preset or ask about published flights, cabins, window or aisle seats, and support. Answers stream as formatted text with ticket cards. Seat holds and dummy payment stay in the booking flow after you confirm."
+        description="Ask about routes, cabins, seats, and trips. Concierge can guide a simulated booking, then hand you off to choose a seat and check out."
       />
       <ConciergeChat />
     </div>

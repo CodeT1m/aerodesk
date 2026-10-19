@@ -87,9 +87,9 @@ export function FlightSearchForm({ airports, defaults }: Props) {
   }
 
   return (
-    <Card className="border-border/80 bg-card/80 shadow-sm">
+    <Card className="panel-surface rounded-2xl">
       <CardHeader>
-        <CardTitle>Find a flight</CardTitle>
+        <CardTitle className="font-heading text-2xl font-semibold">Plan your itinerary</CardTitle>
       </CardHeader>
       <CardContent>
         <form className="grid gap-4" onSubmit={submit}>
@@ -166,7 +166,7 @@ export function FlightSearchForm({ airports, defaults }: Props) {
               {error}
             </p>
           ) : null}
-          <Button type="submit" className="w-full md:w-auto">
+          <Button type="submit" className="h-10 w-full px-6 font-semibold shadow-[0_8px_20px_-12px_var(--primary)] md:w-auto">
             Search flights
           </Button>
         </form>
