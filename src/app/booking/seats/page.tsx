@@ -62,13 +62,18 @@ export default async function SeatsPage({
 
   return (
     <div className="grid gap-6">
+      {(outbound as FlightDetails).simulationSource === "aviationstack" || inbound?.simulationSource === "aviationstack" ? (
+        <p className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-3 text-sm">
+          This flight uses live schedule data for an Aerodesk booking simulation. Fares, seats, and payment are test data; no airline reservation is made.
+        </p>
+      ) : null}
       <PageIntro
         kicker="Seat map"
         title="Choose seats"
         description={
           entitlements.waiveSeatFees
-            ? "Seats are held for five minutes after you continue. Pro complimentary seat selection is active."
-            : "Seats are held for five minutes after you continue. Seat surcharges apply unless you upgrade to Pro."
+            ? "Seats are held for seven hours after you continue. Pro complimentary seat selection is active."
+            : "Seats are held for seven hours after you continue. Seat surcharges apply unless you upgrade to Pro."
         }
       />
       <SeatBookingForm

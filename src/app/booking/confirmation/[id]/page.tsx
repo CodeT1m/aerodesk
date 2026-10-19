@@ -60,6 +60,9 @@ export default async function ConfirmationPage({
             </p>
           ))}
           <p className="text-lg font-semibold">{formatMoney(booking.totalCents, booking.currency)}</p>
+          {booking.simulationSource === "aviationstack" ? (
+            <p className="text-muted-foreground">Aerodesk simulation using live flight timing. This is not an airline ticket.</p>
+          ) : null}
           {payable && booking.holdExpiresAt ? (
             <p className="text-muted-foreground">
               Hold expires {new Date(booking.holdExpiresAt).toLocaleString()}.

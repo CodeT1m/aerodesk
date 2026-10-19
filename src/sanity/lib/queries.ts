@@ -11,6 +11,7 @@ export const AIRPORTS_QUERY = groq`*[_type == "airport"] | order(city asc) {
 
 export const FLIGHT_SEARCH_QUERY = groq`*[_type == "flightInstance"
   && status == "scheduled"
+  && !defined(simulationSource)
   && origin->iata == $origin
   && destination->iata == $destination
   && departureAt >= $start
@@ -21,6 +22,7 @@ export const FLIGHT_SEARCH_QUERY = groq`*[_type == "flightInstance"
   departureAt,
   arrivalAt,
   status,
+  simulationSource,
   origin->{ iata, name, city, timezone },
   destination->{ iata, name, city, timezone },
   aircraft->{ _id, name, code, layoutVersion },
@@ -33,6 +35,7 @@ export const FLIGHT_DETAILS_QUERY = groq`*[_type == "flightInstance" && _id == $
   departureAt,
   arrivalAt,
   status,
+  simulationSource,
   origin->{ iata, name, city, country, timezone },
   destination->{ iata, name, city, country, timezone },
   aircraft->{
@@ -82,6 +85,7 @@ export const BOOKING_BY_ID_QUERY = groq`*[_type == "booking" && _id == $id][0] {
   totalCents,
   currency,
   proSeatWaiverApplied,
+  simulationSource,
   idempotencyKey,
   holdExpiresAt,
   confirmedAt
@@ -96,7 +100,9 @@ export const BOOKING_BY_IDEMPOTENCY_QUERY = groq`*[_type == "booking" && clerkUs
   currency
 }`;
 
-export const MY_BOOKINGS_QUERY = groq`*[_type == "booking" && clerkUserId == $clerkUserId] | order(_createdAt desc) {
+export const MY_BOOKINGS_QUERY = groq`*[_type == "booking" && clerkUserId == $clerkUserId
+  && !(status in ["held", "payment_failed"] && defined(holdExpiresAt) && holdExpiresAt <= now())
+] | order(_createdAt desc) {
   _id,
   reference,
   tripType,
@@ -104,6 +110,7 @@ export const MY_BOOKINGS_QUERY = groq`*[_type == "booking" && clerkUserId == $cl
   paymentStatus,
   totalCents,
   currency,
+  simulationSource,
   confirmedAt,
   holdExpiresAt,
   legs[]{ flightNumber, originIata, destinationIata, departureAt, cabin, seatCodes }

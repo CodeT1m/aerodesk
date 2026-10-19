@@ -173,6 +173,7 @@ export async function createHold(input: HoldInput) {
     totalCents: totals.totalCents,
     currency: totals.currency,
     proSeatWaiverApplied: input.waiveSeatFees,
+    simulationSource: loaded.some((flight) => flight.simulationSource === "aviationstack") ? "aviationstack" : undefined,
     idempotencyKey: input.idempotencyKey,
     holdExpiresAt: expiresAt,
   });

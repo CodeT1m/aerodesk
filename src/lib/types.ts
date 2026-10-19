@@ -38,6 +38,7 @@ export type FlightSummary = {
   departureAt: string;
   arrivalAt: string;
   status: string;
+  simulationSource?: "aviationstack";
   origin: AirportSummary;
   destination: AirportSummary;
   aircraft?: { _id: string; name: string; code: string; layoutVersion: string };

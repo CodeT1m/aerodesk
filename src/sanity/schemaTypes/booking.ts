@@ -159,6 +159,13 @@ export const booking = defineType({
       initialValue: false,
     }),
     defineField({
+      name: "simulationSource",
+      title: "Simulation source",
+      type: "string",
+      options: { list: [{ title: "Aviationstack live feed", value: "aviationstack" }] },
+      readOnly: true,
+    }),
+    defineField({
       name: "idempotencyKey",
       type: "string",
       validation: (rule) => rule.required(),

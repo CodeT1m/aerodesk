@@ -31,6 +31,33 @@ type FlightTemplate = {
   fares: { cabin: Cabin; amountCents: number; currency: string }[];
 };
 
+const extraAirports = [
+  { iata: "LAX", name: "Los Angeles International", city: "Los Angeles", country: "United States", timezone: "America/Los_Angeles" },
+  { iata: "ORD", name: "O'Hare International", city: "Chicago", country: "United States", timezone: "America/Chicago" },
+  { iata: "CDG", name: "Charles de Gaulle", city: "Paris", country: "France", timezone: "Europe/Paris" },
+  { iata: "KUL", name: "Kuala Lumpur International", city: "Kuala Lumpur", country: "Malaysia", timezone: "Asia/Kuala_Lumpur" },
+  { iata: "DXB", name: "Dubai International", city: "Dubai", country: "United Arab Emirates", timezone: "Asia/Dubai" },
+  { iata: "BKK", name: "Suvarnabhumi", city: "Bangkok", country: "Thailand", timezone: "Asia/Bangkok" },
+  { iata: "HKG", name: "Hong Kong International", city: "Hong Kong", country: "Hong Kong", timezone: "Asia/Hong_Kong" },
+];
+
+const extraRoutes = [
+  { number: "AE500", origin: "SFO", destination: "LAX", hours: 1.5, hourUtc: 16, economy: 11900 },
+  { number: "AE501", origin: "LAX", destination: "SFO", hours: 1.5, hourUtc: 20, economy: 11900 },
+  { number: "AE510", origin: "JFK", destination: "ORD", hours: 2.6, hourUtc: 13, economy: 15900 },
+  { number: "AE511", origin: "ORD", destination: "JFK", hours: 2.3, hourUtc: 18, economy: 15900 },
+  { number: "AE520", origin: "LHR", destination: "CDG", hours: 1.3, hourUtc: 9, economy: 13900 },
+  { number: "AE521", origin: "CDG", destination: "LHR", hours: 1.4, hourUtc: 14, economy: 13900 },
+  { number: "AE530", origin: "SIN", destination: "KUL", hours: 1.1, hourUtc: 3, economy: 8900 },
+  { number: "AE531", origin: "KUL", destination: "SIN", hours: 1.1, hourUtc: 8, economy: 8900 },
+  { number: "AE540", origin: "SIN", destination: "BKK", hours: 2.5, hourUtc: 5, economy: 14900 },
+  { number: "AE541", origin: "BKK", destination: "SIN", hours: 2.5, hourUtc: 10, economy: 14900 },
+  { number: "AE550", origin: "NRT", destination: "HKG", hours: 4.8, hourUtc: 4, economy: 22900 },
+  { number: "AE551", origin: "HKG", destination: "NRT", hours: 4.3, hourUtc: 10, economy: 22900 },
+  { number: "AE560", origin: "DXB", destination: "LHR", hours: 7.5, hourUtc: 1, economy: 36900 },
+  { number: "AE561", origin: "LHR", destination: "DXB", hours: 6.8, hourUtc: 12, economy: 36900 },
+];
+
 async function run() {
   // The original seed's flight IDs are kept as templates, including flights
   // referenced by existing bookings. Never replace or delete those documents.
@@ -52,6 +79,26 @@ async function run() {
 
   if (routes.size === 0) {
     throw new Error("No original demo flights found. Run `pnpm seed` first.");
+  }
+
+  const base = routes.values().next().value;
+  if (!base) throw new Error("No aircraft template found");
+  for (const route of extraRoutes) {
+    const departureAt = new Date(Date.UTC(2026, 0, 1, route.hourUtc, 15)).toISOString();
+    routes.set(route.number, {
+      _id: `template-${route.number.toLowerCase()}`,
+      flightNumber: route.number,
+      origin: { _ref: `airport-${route.origin.toLowerCase()}` },
+      destination: { _ref: `airport-${route.destination.toLowerCase()}` },
+      aircraft: base.aircraft,
+      departureAt,
+      arrivalAt: new Date(Date.parse(departureAt) + route.hours * 3_600_000).toISOString(),
+      fares: (["economy", "business", "first"] as const).map((cabin) => ({
+        cabin,
+        amountCents: cabin === "economy" ? route.economy : cabin === "business" ? route.economy * 3 : route.economy * 5,
+        currency: "usd",
+      })),
+    });
   }
 
   const now = new Date();
@@ -98,6 +145,13 @@ async function run() {
   const lastDay = new Date(todayUtc + horizonDays * 86_400_000).toISOString().slice(0, 10);
   console.log(`${dryRun ? "Would seed" : "Seeding"} ${flights.length} demo flights across ${routes.size} routes, ${firstDay} through ${lastDay}`);
   if (dryRun) return;
+
+  const airportTx = extraAirports.reduce((tx, airport) => tx.createIfNotExists({
+    _id: `airport-${airport.iata.toLowerCase()}`,
+    _type: "airport",
+    ...airport,
+  }), client.transaction());
+  await airportTx.commit({ visibility: "sync" });
 
   for (let offset = 0; offset < flights.length; offset += batchSize) {
     const batch = flights.slice(offset, offset + batchSize);

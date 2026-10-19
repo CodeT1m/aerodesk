@@ -17,6 +17,7 @@ type Booking = {
   paymentStatus: string;
   holdExpiresAt?: string;
   proSeatWaiverApplied?: boolean;
+  simulationSource?: "aviationstack";
   legs: {
     flightNumber: string;
     originIata: string;
@@ -64,6 +65,11 @@ export function DummyCheckout({ booking }: { booking: Booking }) {
           This is a simulated charge. No card details are collected or sent to Stripe. Aerodesk Pro
           membership is billed separately through Clerk.
         </p>
+        {booking.simulationSource === "aviationstack" ? (
+          <p className="rounded-lg border border-cyan-500/30 bg-cyan-500/10 p-3 text-sm">
+            Live flight timing is used for this test. The fare and seats are simulated in Aerodesk, and no airline reservation is made.
+          </p>
+        ) : null}
         <div className="rounded-lg bg-muted p-4 text-sm">
           <p className="font-medium">Booking {booking.reference}</p>
           {(booking.legs ?? []).map((leg) => (

@@ -73,6 +73,13 @@ export const flightInstance = defineType({
       initialValue: "scheduled",
       validation: (rule) => rule.required(),
     }),
+    defineField({
+      name: "simulationSource",
+      title: "Simulation source",
+      type: "string",
+      options: { list: [{ title: "Aviationstack live feed", value: "aviationstack" }] },
+      readOnly: true,
+    }),
   ],
   preview: {
     select: {

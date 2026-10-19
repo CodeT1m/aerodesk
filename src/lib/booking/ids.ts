@@ -25,4 +25,4 @@ export function cabinRank(cabin: Cabin): number {
   return 1;
 }
 
-export const HOLD_MS = 30 * 60 * 1000;
+export const HOLD_MS = 7 * 60 * 60 * 1000;

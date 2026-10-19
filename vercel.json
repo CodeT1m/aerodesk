@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/classify-insights",
       "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-holds",
+      "schedule": "0 3 * * *"
     }
   ]
 }

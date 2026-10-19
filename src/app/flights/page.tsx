@@ -101,7 +101,12 @@ export default async function FlightsPage({
         </Link>
         <PageIntro title={`${origin} to ${destination}`} />
       </div>
-      <LiveFlightResults origin={liveOrigin} destination={liveDestination} {...live} />
+      <LiveFlightResults
+        origin={liveOrigin}
+        destination={liveDestination}
+        {...live}
+        selection={{ tripType, cabin, passengers, departDate: params.departDate, returnDate: params.returnDate, outboundId }}
+      />
       {!selectingReturn ? (
         <FlightResults
           title="Sample booking flights · Outbound"

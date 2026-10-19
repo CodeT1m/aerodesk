@@ -30,7 +30,7 @@ function stringOrNull(value: unknown): string | null {
 export function normalizeLiveFlights(data: unknown, origin: string, destination: string): LiveFlight[] {
   if (!Array.isArray(data)) return [];
 
-  return data.flatMap((item: ApiFlight, index) => {
+  return data.flatMap((item: ApiFlight) => {
     const departure = item?.departure;
     const arrival = item?.arrival;
     const flightNumber = stringOrNull(item?.flight?.iata);
@@ -42,7 +42,7 @@ export function normalizeLiveFlights(data: unknown, origin: string, destination:
 
     const arrivalAt = stringOrNull(arrival?.scheduled);
     return [{
-      id: `${flightNumber}-${departureAt}-${index}`,
+      id: `${flightNumber}-${departureAt}`,
       flightNumber,
       airline: stringOrNull(item?.airline?.name) ?? "Airline unavailable",
       status: stringOrNull(item?.flight_status) ?? "unknown",
@@ -69,14 +69,22 @@ export async function getLiveFlights(origin: string, destination: string): Promi
   url.searchParams.set("access_key", key);
   url.searchParams.set("dep_iata", origin);
   url.searchParams.set("arr_iata", destination);
-  url.searchParams.set("limit", "50");
+  url.searchParams.set("limit", "100");
 
   try {
-    const response = await fetch(url, { next: { revalidate: 3600 }, signal: AbortSignal.timeout(8000) });
+    const response = await fetch(url, { next: { revalidate: 86_400 }, signal: AbortSignal.timeout(8000) });
     if (!response.ok) return { flights: [], available: false };
     const payload = (await response.json()) as ApiResponse;
     if (payload.error || !Array.isArray(payload.data)) return { flights: [], available: false };
-    return { flights: normalizeLiveFlights(payload.data, origin, destination), available: true };
+    const flights = normalizeLiveFlights(payload.data, origin, destination);
+    const now = Date.now();
+    flights.sort((a, b) => {
+      const aUpcoming = a.status === "scheduled" && Date.parse(a.departureAt) > now;
+      const bUpcoming = b.status === "scheduled" && Date.parse(b.departureAt) > now;
+      if (aUpcoming !== bUpcoming) return aUpcoming ? -1 : 1;
+      return Math.abs(Date.parse(a.departureAt) - now) - Math.abs(Date.parse(b.departureAt) - now);
+    });
+    return { flights, available: true };
   } catch {
     return { flights: [], available: false };
   }

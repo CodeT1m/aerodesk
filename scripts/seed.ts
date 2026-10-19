@@ -124,7 +124,7 @@ async function run() {
             {
               _type: "span",
               _key: "s1",
-              text: "Economy, Business, and First each have their own cabin map. Held seats expire after 30 minutes unless dummy payment succeeds. Open My trips to resume payment while the hold is live. Pro membership waives seat-selection surcharges but still charges the published base fare.",
+              text: "Economy, Business, and First each have their own cabin map. Held seats expire after seven hours unless dummy payment succeeds. Open My trips to resume payment while the hold is live. Pro membership waives seat-selection surcharges but still charges the published base fare.",
             },
           ],
         },

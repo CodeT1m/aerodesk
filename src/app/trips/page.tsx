@@ -24,6 +24,7 @@ export default async function TripsPage() {
     totalCents: number;
     currency: string;
     holdExpiresAt?: string;
+    simulationSource?: "aviationstack";
     legs: { flightNumber: string; originIata: string; destinationIata: string }[];
   }[];
 
@@ -57,6 +58,9 @@ export default async function TripsPage() {
                     ? ` · hold until ${new Date(booking.holdExpiresAt).toLocaleTimeString()}`
                     : null}
                 </p>
+                {booking.simulationSource === "aviationstack" ? (
+                  <p className="mt-1 text-xs text-muted-foreground">Aerodesk simulation · no airline reservation</p>
+                ) : null}
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <BookingActions booking={booking} />
