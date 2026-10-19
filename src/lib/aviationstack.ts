@@ -16,7 +16,7 @@ export type LiveFlight = {
 type ApiFlight = {
   flight_status?: unknown;
   airline?: { name?: unknown };
-  flight?: { iata?: unknown };
+  flight?: { iata?: unknown; codeshared?: { flight_iata?: unknown } | null };
   departure?: { iata?: unknown; scheduled?: unknown; terminal?: unknown; gate?: unknown };
   arrival?: { iata?: unknown; scheduled?: unknown; terminal?: unknown; gate?: unknown };
 };
@@ -30,7 +30,8 @@ function stringOrNull(value: unknown): string | null {
 export function normalizeLiveFlights(data: unknown, origin: string, destination: string): LiveFlight[] {
   if (!Array.isArray(data)) return [];
 
-  return data.flatMap((item: ApiFlight) => {
+  const unique = new Map<string, { flight: LiveFlight; isCodeshare: boolean }>();
+  for (const item of data as ApiFlight[]) {
     const departure = item?.departure;
     const arrival = item?.arrival;
     const flightNumber = stringOrNull(item?.flight?.iata);
@@ -38,11 +39,15 @@ export function normalizeLiveFlights(data: unknown, origin: string, destination:
     if (
       departure?.iata !== origin || arrival?.iata !== destination ||
       !flightNumber || !departureAt || Number.isNaN(Date.parse(departureAt))
-    ) return [];
+    ) continue;
 
     const arrivalAt = stringOrNull(arrival?.scheduled);
-    return [{
-      id: `${flightNumber}-${departureAt}`,
+    const operatingNumber = stringOrNull(item?.flight?.codeshared?.flight_iata)?.toUpperCase();
+    const id = `${operatingNumber ?? flightNumber}-${departureAt}`;
+    const previous = unique.get(id);
+    if (previous && (!previous.isCodeshare || Boolean(operatingNumber))) continue;
+    unique.set(id, { isCodeshare: Boolean(operatingNumber), flight: {
+      id,
       flightNumber,
       airline: stringOrNull(item?.airline?.name) ?? "Airline unavailable",
       status: stringOrNull(item?.flight_status) ?? "unknown",
@@ -52,8 +57,9 @@ export function normalizeLiveFlights(data: unknown, origin: string, destination:
       departureGate: stringOrNull(departure?.gate),
       arrivalTerminal: stringOrNull(arrival?.terminal),
       arrivalGate: stringOrNull(arrival?.gate),
-    }];
-  });
+    } });
+  }
+  return [...unique.values()].map(({ flight }) => flight);
 }
 
 export async function getLiveFlights(origin: string, destination: string): Promise<{
