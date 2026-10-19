@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clerk.com/schemas/platform-config/2025-01-01",
+  "type": "object",
+  "properties": {
+    "billing": {
+      "type": "object",
+      "description": "Billing configuration",
+      "properties": {
+        "features": {
+          "type": "object",
+          "description": "Billable features keyed by slug",
+          "properties": {
+            "*": {
+              "type": "object",
+              "description": "Feature configuration",
+              "properties": {
+                "avatar_url": {
+                  "type": "string",
+                  "description": "Feature avatar URL"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Feature description"
+                },
+                "include_in_jwt": {
+                  "type": "boolean",
+                  "description": "Whether the feature is included in session JWTs",
+                  "default": true
+                },
+                "jwt_value": {
+                  "type": "string",
+                  "description": "Optional custom value included in JWT claims"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Feature display name"
+                },
+                "publicly_visible": {
+                  "type": "boolean",
+                  "description": "Whether the feature is visible to end users",
+                  "default": false
+                }
+              }
+            }
+          }
+        },
+        "free_trial_requires_payment_method": {
+          "type": "boolean",
+          "description": "Require payment method for free trials",
+          "default": true
+        },
+        "organization_enabled": {
+          "type": "boolean",
+          "description": "Enable billing for organizations. When enabled, a default free plan (free_org) is created automatically. Requires organizations to be enabled on the instance.",
+          "default": false
+        },
+        "plans": {
+          "type": "object",
+          "description": "Subscription plans keyed by slug",
+          "properties": {
+            "*": {
+              "type": "object",
+              "description": "Subscription plan configuration",
+              "properties": {
+                "amount": {
+                  "type": "integer",
+                  "description": "Monthly price in cents",
+                  "default": 0
+                },
+                "annual_monthly_amount": {
+                  "type": "integer",
+                  "description": "Monthly equivalent when billed annually, in cents",
+                  "default": 0
+                },
+                "currency": {
+                  "type": "string",
+                  "description": "Currency code (e.g. usd)"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Plan description"
+                },
+                "features": {
+                  "type": "array",
+                  "description": "Feature slugs attached to this plan, in display order. Empty array clears all features; omit to leave attachments unchanged.",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "free_trial_days": {
+                  "type": "integer",
+                  "description": "Number of free trial days",
+                  "default": 0
+                },
+                "free_trial_enabled": {
+                  "type": "boolean",
+                  "description": "Whether free trial is available",
+                  "default": false
+                },
+                "is_recurring": {
+                  "type": "boolean",
+                  "description": "Whether plan is subscription-based",
+                  "default": true
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Plan display name"
+                },
+                "payer_type": {
+                  "type": "string",
+                  "description": "Who pays: user or org. Must match an enabled billing type (user_enabled or organization_enabled)."
+                },
+                "publicly_visible": {
+                  "type": "boolean",
+                  "description": "Whether plan is visible to end users",
+                  "default": true
+                }
+              }
+            }
+          }
+        },
+        "user_enabled": {
+          "type": "boolean",
+          "description": "Enable billing for users. When enabled, a default free plan (free_user) is created automatically.",
+          "default": false
+        }
+      }
+    }
+  }
+}
