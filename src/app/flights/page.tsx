@@ -3,6 +3,7 @@ import { FlightSearchForm } from "@/components/flight-search-form";
 import { PageIntro } from "@/components/page-intro";
 import { AIRPORTS_QUERY, FLIGHT_SEARCH_QUERY } from "@/sanity/lib/queries";
 import { sanityFetch } from "@/sanity/lib/live";
+import { getPublishedClient } from "@/sanity/lib/fresh";
 import { dayBoundsUtc, defaultSearchDates, isCabin, isTripType, type AirportSummary, type Cabin, type FlightSummary, type TripType } from "@/lib/types";
 import Link from "next/link";
 
@@ -33,6 +34,7 @@ export default async function FlightsPage({
   const cabin: Cabin = isCabin(rawCabin) ? rawCabin : "economy";
   const passengers = params.passengers ?? "1";
   const outboundId = params.outboundId;
+  const searchClient = getPublishedClient();
 
   if (!origin || !destination || !params.departDate) {
     return (
@@ -52,25 +54,26 @@ export default async function FlightsPage({
   }
 
   const outboundWindow = dayBoundsUtc(params.departDate);
-  const { data: outbound } = await sanityFetch({
-    query: FLIGHT_SEARCH_QUERY,
-    params: { origin, destination, start: outboundWindow.start, end: outboundWindow.end },
-  });
+  const outbound = await searchClient.fetch<FlightSummary[]>(
+    FLIGHT_SEARCH_QUERY,
+    { origin, destination, start: outboundWindow.start, end: outboundWindow.end },
+    { cache: "no-store" },
+  );
 
   const selectingReturn = tripType === "roundtrip" && Boolean(outboundId);
   let inbound: FlightSummary[] = [];
   if (selectingReturn && params.returnDate) {
     const inboundWindow = dayBoundsUtc(params.returnDate);
-    const result = await sanityFetch({
-      query: FLIGHT_SEARCH_QUERY,
-      params: {
+    inbound = await searchClient.fetch<FlightSummary[]>(
+      FLIGHT_SEARCH_QUERY,
+      {
         origin: destination,
         destination: origin,
         start: inboundWindow.start,
         end: inboundWindow.end,
       },
-    });
-    inbound = (result.data ?? []) as FlightSummary[];
+      { cache: "no-store" },
+    );
   }
 
   const seatQuery = new URLSearchParams({
