@@ -11,6 +11,7 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "seed": "tsx --env-file=.env.local scripts/seed.ts",
+    "seed:flights": "tsx --env-file=.env.local scripts/seed-flights.ts",
     "typegen": "sanity schema extract && sanity typegen generate",
     "sanity:embeddings": "sanity datasets embeddings status production",
     "sanity:embeddings:enable": "tsx --env-file=.env.local scripts/enable-embeddings.ts",
